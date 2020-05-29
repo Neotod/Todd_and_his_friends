@@ -567,8 +567,8 @@ class Game:
             
         pygame.display.flip()
             
-        # if self.player.health <= 0:
-        #     self.state = 'game-over'
+        if self.player.health <= 0:
+            self.state = 'game-over'
 
         # play pause sound
         if self.state == 'pause':
