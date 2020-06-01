@@ -275,16 +275,13 @@ class Game:
             pygame.mixer.music.load(file_path)
             pygame.mixer.music.play()
 
-    def loop(self):
+    def update_sprites(self):
         delta_t = self.clock.tick(FPS)
-
         ground_rect = self.ground.rect
         player_rect = self.player.rect
-        healer_rect = self.healer.rect
         
         player_pos = player_rect.center
-        healer_pos = healer_rect.center
-        
+                
         # update sprites
         keys_pressed = pygame.key.get_pressed()
         self.ground.update(keys_pressed, self.player ,delta_t)
@@ -347,6 +344,9 @@ class Game:
             
         self.display.fill((0, 0, 0))
         
+    def handle_events(self):
+        ground_rect = self.ground.rect
+        
         # handle events
         events = pygame.event.get()
         for event in events:
@@ -373,6 +373,7 @@ class Game:
             if event.type == MOUSEMOTION:
                 self.mouse_pos = event.pos
                 
+                
         # make child_enmey1 => dirty or dusty
         if self.child1_make_timer == 0:
             number_of_child1 = len(self.child1_sprites.sprites())
@@ -396,7 +397,10 @@ class Game:
                 self.child2_make_timer = 500
         else:
             self.child2_make_timer -= 1
-                
+            
+    def show_sprites(self):
+        ground_rect = self.ground.rect
+        
         # show sprites
         self.ground.show(self.display)
             
@@ -448,13 +452,10 @@ class Game:
         
         if len(self.player.used_potions) != 0:
             self.player.show_potion_timer(self.display)
-        
-        # heal player when is in healing range and check if healer can heal him because of some reasons
-        player_health = self.player.health
-        is_healer_should_heal = self.healer.is_healer_should_heal(player_pos, player_health)
-        if is_healer_should_heal == True:
-            self.healer.heal(self.player)
-        
+    
+    def detect_collisions(self):
+        player_rect = self.player.rect
+        healer_rect = self.healer.rect
         
         # collision detectons
         for boss in self.boss_sprites:
@@ -578,6 +579,26 @@ class Game:
         elif self.state == 'game-over':
             file_path = r'data\sounds\sfx\game_over_sound.wav'
             play_sound(file_path, 0.1, 0)
+        
+    def loop(self):
+        ground_rect = self.ground.rect
+        player_rect = self.player.rect
+        healer_rect = self.healer.rect
+        
+        player_pos = player_rect.center
+        healer_pos = healer_rect.center
+        
+        self.update_sprites()
+        self.handle_events()
+        self.show_sprites()
+        
+        # heal player when is in healing range and check if healer can heal him because of some reasons
+        player_health = self.player.health
+        is_healer_should_heal = self.healer.is_healer_should_heal(player_pos, player_health)
+        if is_healer_should_heal == True:
+            self.healer.heal(self.player)
+        
+        self.detect_collisions()
         
     def show_bottom_bar(self):
         bottom_bar_surf = pygame.Surface((SCREEN_WIDTH, 40))
