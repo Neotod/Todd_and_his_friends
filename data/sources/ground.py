@@ -1,4 +1,7 @@
 import pygame
+from data.sources.files import Files
+
+get_path = Files.get_full_path
 
 # constants
 SCREEN_HEIGHT, SCREEN_WIDTH = 500, 900
@@ -9,7 +12,8 @@ class Ground(pygame.sprite.Sprite):
     
     def __init__(self):
         super().__init__()
-        self.surface = pygame.image.load(r'data\images\ground\ground.png')
+        ground_image_path = get_path('images', 'ground', 'ground')
+        self.surface = pygame.image.load(ground_image_path)
         self.position = [SCREEN_WIDTH // 2 - 50, SCREEN_HEIGHT // 2 - 30]
         self.rect = self.surface.get_rect(center = tuple(self.position))
         
@@ -183,7 +187,7 @@ class Ground(pygame.sprite.Sprite):
             (635, 320), (660, 335), (660, 220), (890, 175), (920, 175)
         ]
         
-        image_path = r'data\images\ground\swamp.png'
+        image_path = get_path('images', 'ground', 'swamp')
         swamp_image = pygame.image.load(image_path)
         for i in range(11):
             self.swamp_surfs.append(swamp_image)
@@ -205,7 +209,7 @@ class Ground(pygame.sprite.Sprite):
         ridge_surfs = []
         ridge_rects = []
         for i in range(3):
-            image_path = r'data\images\ground\ridges\\' + str(i + 1) + '.png'
+            image_path = get_path('images', 'ground', 'ridges', str(i+1))
             image = pygame.image.load(image_path)
             ridge_surfs.append(image)
             
@@ -229,7 +233,7 @@ class Ground(pygame.sprite.Sprite):
         bush_surfs = []
         bush_rects = []
         for i in range(4):
-            image_path = r'data\images\ground\bushes\\' + str(i + 1) + '.png'
+            image_path = get_path('images', 'ground', 'bushes', str(i+1))
             image = pygame.image.load(image_path)
             bush_surfs.append(image)
             
@@ -254,7 +258,7 @@ class Ground(pygame.sprite.Sprite):
         tree_surfs = []
         tree_rects = []
         for i in range(2):
-            image_path = r'data\images\ground\trees\\' + str(i + 1) + '.png'
+            image_path = get_path('images', 'ground', 'trees', str(i+1))
             tree_image = pygame.image.load(image_path)
             tree_surfs.append(tree_image)
             
@@ -279,7 +283,7 @@ class Ground(pygame.sprite.Sprite):
         willow_rects = []
         image_num = 1
         for i in range(3):
-            image_path = r'data\images\ground\willows\\' + str(image_num) + '.png'
+            image_path = get_path('images', 'ground', 'willows', str(image_num))
             image = pygame.image.load(image_path)
             image_num += 1
             
@@ -305,7 +309,8 @@ class Ground(pygame.sprite.Sprite):
 
         # make graves (dirty and dusty born places)
         for i in range(2):
-            image_path = r'data\images\enemy\child_enemy\grave' + str(i + 1) + '.png'
+            image_name = 'grave' + str(i+1)
+            image_path = get_path('images', 'ground', 'born_places', image_name)
             image = pygame.image.load(image_path)
             self.enemy_born_place_surfs.append(image)
             
@@ -319,7 +324,7 @@ class Ground(pygame.sprite.Sprite):
             self.enemy_born_place_rects.append(grave_rect)
         
         # make gate (child wiz born place)
-        image_path = r'data\images\enemy\child_enemy\gate.png'
+        image_path = get_path('images', 'ground', 'born_places', 'gate')
         image = pygame.image.load(image_path)
         self.enemy_born_place_surfs.append(image)
 

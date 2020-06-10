@@ -1,12 +1,17 @@
 import pygame
 import math
 
+from data.sources.files import Files
+
+get_path = Files.get_full_path
+
 class Shot(pygame.sprite.Sprite):
     
     def __init__(self, center_pos, ground_rect, time, speed):
         super().__init__()
-        image = pygame.image.load(r'data\images\characters\player\fireball\1.png')
-        self.surface = image
+        
+        image_path = get_path('images', 'player', 'fireball')
+        self.surface = pygame.image.load(image_path)
         
         self.coord_steps = [0, 0]
         self.center_pos = [center_pos[0], center_pos[1]]

@@ -1,6 +1,9 @@
 import pygame
 from data.sources.game import Game
-from data.sources.pygame_functions import play_sound
+from data.sources.files import Files
+
+play_sound = Files.play_sound
+get_path = Files.get_full_path
 
 def start_again():
     global game
@@ -10,7 +13,7 @@ def start_again():
     game.setup()
     game.state = 'run'
     
-    music_path =  r'data\sounds\loops\No-Tomorrow.mp3'
+    music_path = get_path('sounds', 'loops', 'No-Tomorrow')
     pygame.mixer.music.load(music_path)
     pygame.mixer.music.play(loops=-1)
 

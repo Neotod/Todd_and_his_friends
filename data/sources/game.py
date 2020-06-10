@@ -4,13 +4,18 @@ from random import choice
 
 import time
 
+from data.sources.files import Files
+Files.load()
+
 from data.sources.player import Player
 from data.sources.enemy import Child_Enemy, Boss_Enemy
 from data.sources.ground import Ground
 from data.sources.shot import Shot
 from data.sources.npc import Healer, Alchemist
 from data.sources.screen import Screen
-from data.sources.pygame_functions import play_sound
+
+get_path = Files.get_full_path
+play_sound = Files.play_sound
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
@@ -58,7 +63,7 @@ class Game:
         self.show_shooting_power = False
         
     def setup(self):
-        image_path = r'data\images\icon.png'
+        image_path = get_path('images', 'icon')
         icon = pygame.image.load(image_path)
         pygame.display.set_icon(icon)
         pygame.display.set_caption('Todd and his friends')
@@ -95,13 +100,13 @@ class Game:
         self.child2_sprites.add(child2_enemy)
         
         # background sound
-        music_path = r'data\sounds\loops\Thought-Soup.mp3'
+        music_path = get_path('sounds', 'loops', 'Thought-Soup')
         pygame.mixer.music.load(music_path)
         pygame.mixer.music.set_volume(0.1)
         pygame.mixer.music.play(loops=-1)
         
     def make_screens(self):
-        folder_path = r'data\images\screens\start\bg_gif'
+        folder_path = get_path('images', 'screens', 'start', 'bg_gif')
         gif_pos = (SCREEN_WIDTH // 2, 75)
         self.start_screen.make_gif(folder_path, 70, gif_pos)
         
@@ -201,13 +206,13 @@ class Game:
                                 main_menu_btn['text_size'])
         
         
-        healer_path = r'data\images\screens\start\healer'
+        healer_path = get_path('images', 'screens', 'start', 'healer', 'idle')
         self.start_screen.make_gif(healer_path, 200, (390, 100), loop=-1)
         
-        player_path = r'data\images\screens\start\player'
+        player_path = get_path('images', 'screens', 'start', 'player', 'idle')
         self.start_screen.make_gif(player_path, 100,  (450, 112), (50, 75), loop=-1)
         
-        alchemist_path = r'data\images\screens\start\alchemist'
+        alchemist_path = get_path('images', 'screens', 'start', 'alchemist', 'idle')
         self.start_screen.make_gif(alchemist_path, 200, (510, 100), loop=-1)
     
     def start(self):
@@ -246,13 +251,13 @@ class Game:
         self.clock.tick(0)
         
         if self.state == 'run':
-            file_path = r'data\sounds\sfx\pause\out.wav'
+            file_path = get_path('sounds', 'sfx', 'pause', 'out')
             play_sound(file_path, 0.5)
             pygame.mixer.music.unpause()
         elif self.state == 'start':
             pygame.mixer.music.stop()
             
-            file_path = r'data\sounds\loops\Thought-Soup.mp3'
+            file_path = get_path('sounds', 'loops', 'Thought-Soup')
             pygame.mixer.music.load(file_path)
             pygame.mixer.music.play()
             
@@ -271,7 +276,7 @@ class Game:
         pygame.mixer.music.stop()
         
         if self.state == 'start':
-            file_path = r'data\sounds\loops\Thought-Soup.mp3'
+            file_path = get_path('sounds', 'loops', 'Thought-Soup')
             pygame.mixer.music.load(file_path)
             pygame.mixer.music.play()
 
@@ -316,7 +321,7 @@ class Game:
                 self.boss_sprites.add(boss)
                 revived_bosses.append(boss_name)
                 
-                file_path = r'data\sounds\sfx\enemy\boss\rise_again.wav'
+                file_path = get_path('sounds', 'sfx', 'enemy', 'boss', 'rise_again')
                 play_sound(file_path, 0.1)
         
         for revived_boss in revived_bosses:
@@ -573,11 +578,11 @@ class Game:
 
         # play pause sound
         if self.state == 'pause':
-            file_path = r'data\sounds\sfx\pause\in.wav'
+            file_path = get_path('sounds', 'sfx', 'pause', 'in')
             play_sound(file_path, 0.5)
         # play game-over sound
         elif self.state == 'game-over':
-            file_path = r'data\sounds\sfx\game_over_sound.wav'
+            file_path = get_path('sounds', 'sfx', 'game_over_sound')
             play_sound(file_path, 0.1, 0)
         
     def loop(self):
@@ -620,7 +625,7 @@ class Game:
         boss_timer = boss_dict[1]['timer']
         
         image_num = boss_timer // 80
-        image_path = r'data\images\enemy\boss_enemy\health\\' + str(image_num) + '.png'
+        image_path = get_path('images', 'enemy', 'boss', 'health_bar', str(image_num))
         timer_image = pygame.image.load(image_path)
         
         if boss_name == 'bloody':
@@ -630,5 +635,4 @@ class Game:
         timer_rect = timer_image.get_rect(center = timer_center_pos)
         
         self.display.blit(timer_image, timer_rect)
-        
         

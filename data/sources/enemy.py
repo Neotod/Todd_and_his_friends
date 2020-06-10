@@ -1,10 +1,14 @@
 import pygame
 import math
 from random import choice
+from os import path
 
 from data.sources.shot import Shot
 from data.sources.pygameGIF import GIF
-from data.sources.pygame_functions import play_sound
+from data.sources.files import Files
+
+play_sound = Files.play_sound
+get_path = Files.get_full_path
 
 class Child_Enemy(pygame.sprite.Sprite):
     
@@ -15,9 +19,9 @@ class Child_Enemy(pygame.sprite.Sprite):
             names = ['dusty', 'dirty']
             self.name = choice(names)
         elif father_name == 'wiz':
-            self.name = 'wiz'
+            self.name = 'wizzy'
         
-        folder_path = r'data\images\enemy\child_enemy\{name}\life'.format(name=self.name)
+        folder_path = get_path('images', 'enemy', 'child', self.name, 'state', 'idle')
         if father_name == 'bloody':
             attack_cooldown = 30
             speed = 0.02
@@ -47,12 +51,12 @@ class Child_Enemy(pygame.sprite.Sprite):
         self.attack_moving_steps = []
     
     def born(self, ground_rect):
-        folder_path = r'data\images\enemy\child_enemy\{name}\born'.format(name=self.name)
+        folder_path = get_path('images', 'enemy', 'child', self.name, 'state', 'born')
         if self.name == 'dirty':
             self.start_pos = (530, 170)
         elif self.name == 'dusty':
             self.start_pos = (915, 230)
-        elif self.name == 'wiz':
+        elif self.name == 'wizzy':
             self.start_pos = (285, 330)
         
         self.born_gif = GIF(folder_path, 50, loop=1)
@@ -75,13 +79,13 @@ class Child_Enemy(pygame.sprite.Sprite):
         if self.state != 'born':
             self.show_health(display)
         
-        if self.name == 'wiz':
+        if self.name == 'wizzy':
             for shot in self.shots:
                 display.blit(shot.surface, shot.rect)
                 
     def show_health(self, display):
         health_num = int(self.health)
-        image_path = r'data\images\enemy\child_enemy\{name}\health_bar\{health}.png'.format(name=self.name, health=health_num)
+        image_path = get_path('images', 'enemy', 'child', self.name, 'health_bar', str(health_num))
         health_surface = pygame.image.load(image_path)
         
         enemy_center_x = self.rect.center[0]
@@ -149,7 +153,7 @@ class Child_Enemy(pygame.sprite.Sprite):
                 self.attack_cooldown = self.first_attack_cooldown
                 
         # update shots position
-        if self.name == 'wiz':
+        if self.name == 'wizzy':
             for shot in self.shots:
                 shot.update(ground_rect, delta_t)
                 
@@ -229,12 +233,12 @@ class Child_Enemy(pygame.sprite.Sprite):
         if self.name == 'dirty' or self.name == 'dusty':
             self.state = 'attack'
             self.attack_moving_steps = self.find_moving_steps(self.attack_aim_pos, 0.3)
-        elif self.name == 'wiz':
+        elif self.name == 'wizzy':
             center_pos = self.rect.center
             time, speed = 110, 0.1
             shoot = Shot(center_pos, ground_rect, time, speed)
             
-            fireball_image_path = r'data\images\enemy\child_enemy\wiz\fireball\1.png'
+            fireball_image_path = get_path('images', 'enemy', 'child', 'wizzy', 'fireball')
             shoot.change_image(fireball_image_path)
             
             center_x = self.rect.center[0]
@@ -256,9 +260,9 @@ class Child_Enemy(pygame.sprite.Sprite):
         if self.attack_aim == 'player':
             # play attack sound
             if self.name == 'dusty' or self.name == 'dirty':
-                file_path = r'data\sounds\sfx\enemy\child\dusty_dirty_attack.wav'
-            elif self.name == 'wiz':
-                file_path = r'data\sounds\sfx\enemy\child\wiz_shoot.wav'
+                file_path = get_path('sounds', 'sfx', 'enemy', 'child', 'dusty_dirty_attack')
+            elif self.name == 'wizzy':
+                file_path = get_path('sounds', 'sfx', 'enemy', 'child', 'wizzy_shoot')
                 
             play_sound(file_path, 0.1)
     
@@ -267,7 +271,7 @@ class Child_Enemy(pygame.sprite.Sprite):
         
 class Boss_Enemy(pygame.sprite.Sprite):
     
-    def __init__(self, name = 'bloody'):
+    def __init__(self, name='bloody'):
         super().__init__()
         self.shots = pygame.sprite.Group()
         self.health = 20
@@ -278,10 +282,10 @@ class Boss_Enemy(pygame.sprite.Sprite):
         
         self.name = name
         if self.name == 'bloody':
-            folder_path = r'data\images\enemy\boss_enemy\bloody\idle'
+            folder_path = get_path('images', 'enemy', 'boss', 'bloody', 'idle')
             self.gif = GIF(folder_path, 20, (85, 105))
         elif self.name == 'wiz':
-            folder_path = r'data\images\enemy\boss_enemy\wiz\idle'
+            folder_path = get_path('images', 'enemy', 'boss', 'wiz', 'idle')
             self.gif = GIF(folder_path, 25, (60, 100))
             
         self.bound_surf = pygame.Surface((290, 290))
@@ -327,7 +331,7 @@ class Boss_Enemy(pygame.sprite.Sprite):
         
         if self.health <= 0:
             # play death sound
-            file_path = r'data\sounds\sfx\enemy\boss\boss_killed.wav'
+            file_path = get_path('sounds', 'sfx', 'enemy', 'boss', 'boss_killed')
             play_sound(file_path, 0.3)
             self.kill()
             
@@ -348,12 +352,9 @@ class Boss_Enemy(pygame.sprite.Sprite):
         
         shot = Shot(enemy_pos, ground_rect, 150, 0.1)
         
-        if self.name == 'wiz':
-            fire_ball_path = r'data\images\enemy\boss_enemy\wiz\fireball\1.png'
-            shot.change_image(fire_ball_path)
-        elif self.name == 'bloody':
-            fire_ball_path = r'data\images\enemy\boss_enemy\bloody\fireball\1.png'
-            shot.change_image(fire_ball_path)
+        fireball_path = get_path('images', 'enemy', 'boss', self.name, 'fireball')
+        shot.change_image(fireball_path)
+        
         try:
             angle = abs(math.atan(edge_y / edge_x))
         except ZeroDivisionError:
@@ -364,16 +365,17 @@ class Boss_Enemy(pygame.sprite.Sprite):
         
         # play shot sound
         if self.name == 'bloody':
-            file_path = r'data\sounds\sfx\enemy\boss\bloody_shoot.wav'
+            file_path = get_path('sounds', 'sfx', 'enemy', 'boss', 'bloody_shoot')
         elif self.name == 'wiz':
-            file_path = r'data\sounds\sfx\enemy\boss\wiz_shoot.wav'
+            file_path = get_path('sounds', 'sfx', 'enemy', 'boss', 'wiz_shoot')
         play_sound(file_path, 0.1)
     
     def shot_collide(self, damage):
         if self.health > 0:
             self.health -= damage * 2
         self.shot_collide_timer = 300
-        image_path = r'data\images\enemy\boss_enemy\\' + self.name + r'\idle\1.png'
+        
+        image_path = path.join(get_path('images', 'enemy', 'boss', self.name, 'idle'), '1.png')
         image = pygame.image.load(image_path)
         
         if self.name == 'bloody':
@@ -383,13 +385,14 @@ class Boss_Enemy(pygame.sprite.Sprite):
             
         self.surface = pygame.transform.scale(image, new_scale)
         
-        file_name = r'data\sounds\sfx\enemy\got_hit_with_fireball.wav'
+        file_name = get_path('sounds', 'sfx', 'enemy', 'boss', 'got_hit_with_fireball')
         play_sound(file_name, 0.5)
         
     def show_health(self, display: pygame.Surface):
         health_num = int(self.health // 2)
-        health_image_path = r'data\images\enemy\boss_enemy\health\\' + str(health_num) + '.png'
+        health_image_path = get_path('images', 'enemy', 'boss', 'health_bar', str(health_num))
         health_image = pygame.image.load(health_image_path)
+        
         enemy_center_pos = self.rect.center
         health_center_pos = (enemy_center_pos[0], self.rect.top)
         health_rect = health_image.get_rect(center = health_center_pos)

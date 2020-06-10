@@ -1,10 +1,14 @@
 import pygame
-from random import choice
 import math
+from random import choice
+from os import path
 
 from data.sources.shot import Shot
 from data.sources.pygameGIF import GIF
-from data.sources.pygame_functions import play_sound
+from data.sources.files import Files
+
+play_sound = Files.play_sound
+get_path = Files.get_full_path
 
 # constants
 SCREEN_HEIGHT, SCREEN_WIDTH = 500, 900
@@ -17,7 +21,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.health = 10
         
-        image_path = r'data\images\characters\player\down\idle\1.png'
+        image_path = path.join(get_path('images', 'player', 'movement', 'down', 'idle'), '1.png')
         self.image = pygame.image.load(image_path).convert_alpha()
         image_size = (35, 50)
         self.surface = pygame.transform.smoothscale(self.image, image_size)
@@ -70,7 +74,7 @@ class Player(pygame.sprite.Sprite):
         for i in range(4):
             child_values = ['run', 'idle']
             for j in range(2):
-                folder_path = r'data\images\characters\player\{}\{}'.format(parent_values[i], child_values[j])
+                folder_path = get_path('images', 'player', 'movement', parent_values[i], child_values[j])
                 image_size = (35, 50)
                 gif = GIF(folder_path, 10, image_size)
                 dict_key = parent_values[i] + '_' + child_values[j]
@@ -104,10 +108,13 @@ class Player(pygame.sprite.Sprite):
         weapon_back_surf = pygame.Surface(weapon_back_size)
         weapon_back_surf.set_alpha(100)
         
-        sword_surf = pygame.image.load(r'data\images\characters\player\weapons\sword.png')
+        sword_image_path = get_path('images', 'player', 'weapons', 'sword')
+        
+        sword_surf = pygame.image.load(sword_image_path)
         sword_rect = sword_surf.get_rect(center = (SCREEN_WIDTH - 195, SCREEN_HEIGHT - 15))
         
-        staff_surf = pygame.image.load(r'data\images\characters\player\weapons\staff.png')
+        staff_image_path = get_path('images', 'player', 'weapons', 'staff')
+        staff_surf = pygame.image.load(staff_image_path)
         staff_rect = staff_surf.get_rect(center = (SCREEN_WIDTH - 250, SCREEN_HEIGHT - 20))
         
         if self.current_weapon == 0:
@@ -148,11 +155,11 @@ class Player(pygame.sprite.Sprite):
         for i in range(len(self.potions)):
             potion = self.potions[i]
             if potion == 'strength':
-                image_path = r'data\images\potions\strength\idle\1.png'
+                image_path = path.join(get_path('images', 'potions', 'strength', 'idle'), '1.png')
             elif potion == 'regeneration':
-                image_path = r'data\images\potions\regeneration\idle\1.png'
+                image_path = path.join(get_path('images', 'potions', 'regeneration', 'idle'), '1.png')
             elif potion == 'imortality':
-                image_path = r'data\images\potions\imortality\idle\1.png'
+                image_path = path.join(get_path('images', 'potions', 'imortality', 'idle'), '1.png')
             
             image = pygame.image.load(image_path)
             surface = pygame.transform.scale(image, (20, 35))
@@ -172,8 +179,7 @@ class Player(pygame.sprite.Sprite):
     def show_shooting_power(self, mouse_pos, display):
         shooting_power_num = self.shooting_power // 8
         
-        folder_path = r'data\images\characters\player\shoot_bar\\' 
-        image_path = folder_path + str(shooting_power_num) + '.png'
+        image_path = get_path('images', 'player', 'shoot_bar', str(shooting_power_num))
         shooting_power_surf = pygame.image.load(image_path)
         
         player_pos = self.rect.center
@@ -192,10 +198,8 @@ class Player(pygame.sprite.Sprite):
     def show_potion_timer(self, display):
         center_x, center_y = 30, 30
         for i in range(len(self.used_potions)):
-            folder_path = r'data\images\potions\\' + self.used_potions[i] + r'\timer_bar'
-            
             image_num = self.used_potions_timer[i] // 40
-            image_path = folder_path + '\\' + str(image_num) + '.png'
+            image_path = get_path('images', 'potions', self.used_potions[i], 'timer_bar', str(image_num))
             
             image = pygame.image.load(image_path)
             center_pos = (center_x, center_y)
@@ -227,7 +231,7 @@ class Player(pygame.sprite.Sprite):
                 self.lowhealth_alarm_cooldown -= 1
             else:
                 # play lowhealth alarm
-                file_path = r'data\sounds\sfx\player\lowhealth_alarm.wav'
+                file_path = get_path('sounds', 'sfx', 'player', 'lowhealth_alarm')
                 play_sound(file_path, 0.4)
                 
                 self.lowhealth_alarm_cooldown = 100
@@ -322,7 +326,7 @@ class Player(pygame.sprite.Sprite):
         speed = 0.3
         shot = Shot(self.weapon_head , ground_rect, time, speed)
         
-        fireball_image_path = r'data\images\characters\player\fireball\1.png'
+        fireball_image_path = get_path('images', 'player', 'fireball')
         shot.change_image(fireball_image_path)
         
         player_pos = self.rect.center
@@ -341,7 +345,7 @@ class Player(pygame.sprite.Sprite):
         if 'imortality' not in self.used_potions:
             self.health -= 2
             
-            file_path = r'data\sounds\sfx\player\got_hit.wav'
+            file_path = get_path('sounds', 'sfx', 'player', 'got_hit')
             play_sound(file_path, 0.4)
             
         player_pos = self.rect.center
@@ -372,8 +376,8 @@ class Player(pygame.sprite.Sprite):
                 self.health -= 1
             elif enemy_name == 'wiz':
                 self.health -= 0.5
-        
-            file_path = r'data\sounds\sfx\player\got_hit.wav'
+
+            file_path = get_path('sounds', 'sfx', 'player', 'got_hit')
             play_sound(file_path, 0.2)
         
     def show_health(self, display):
@@ -400,14 +404,14 @@ class Player(pygame.sprite.Sprite):
         width, height = 24, 20
         heart_size = (width, height)
         for i in range(full_hearths):
-            image_path = r'data\images\characters\player\health\heart.png'
+            image_path = get_path('images', 'player', 'health', 'heart')
             heart_image = pygame.image.load(image_path)
             health_surface.blit(heart_image, ((left_offset, top_offset), heart_size))
             left_offset += 23
         
         empty_hearts = 10 - full_hearths
         if half_heart == True:
-            image_path = r'data\images\characters\player\health\half_heart.png'
+            image_path = get_path('images', 'player', 'health', 'half_heart')
             half_heart_image = pygame.image.load(image_path)
             health_surface.blit(half_heart_image, ((left_offset, top_offset), heart_size))
             left_offset += 23
@@ -415,7 +419,7 @@ class Player(pygame.sprite.Sprite):
             empty_hearts -= 1
             
         for i in range(empty_hearts):
-            image_path = r'data\images\characters\player\health\empty_heart.png'
+            image_path = get_path('images', 'player', 'health', 'empty_heart')
             empty_heart_image = pygame.image.load(image_path)
             health_surface.blit(empty_heart_image, ((left_offset, top_offset), heart_size))
             left_offset += 23
@@ -436,8 +440,8 @@ class Player(pygame.sprite.Sprite):
         
         self.weapon_state = 'normal'
         if change_image == True:
-            folder_path = r'data\images\characters\player\weapons\\'
-            image_path = folder_path + self.weapons[self.current_weapon] + '.png'
+            curr_weapon_name = self.weapons[self.current_weapon]
+            image_path = get_path('images', 'player', 'weapons', curr_weapon_name)
             self.weapon_image = pygame.image.load(image_path).convert_alpha()
             self.weapon_rect = self.weapon_image.get_rect(center = self.rect.center)
             
@@ -545,13 +549,13 @@ class Player(pygame.sprite.Sprite):
             self.weapon_angle_step = angle_step
             self.weapon_state = 'attack'
             
-            sound_file_path = r'data\sounds\sfx\player\sword.wav'
+            sound_file_path = get_path('sounds', 'sfx', 'player', 'sword')
             
         elif self.current_weapon == 1:
             self.shoot(mouse_pos, ground_rect)
             self.shooting_power = 9
             
-            sound_file_path = r'data\sounds\sfx\player\shoot.wav'
+            sound_file_path = get_path('sounds', 'sfx', 'player', 'shoot')
             
         play_sound(sound_file_path, 0.1)
            
@@ -561,8 +565,8 @@ class Player(pygame.sprite.Sprite):
         alchemist.potion = ''
         alchemist.give_potion_cooldown = 1000   
         
-        file_path = r'data\sounds\sfx\player\pickup_potion.wav'
-        play_sound(file_path, 0.2)
+        sound_file_path = get_path('sounds', 'sfx', 'player', 'pickup_potion')
+        play_sound(sound_file_path, 0.2)
      
     def click_on_potion(self, mouse_pos):
         clicked_potion = ''
@@ -597,12 +601,12 @@ class Player(pygame.sprite.Sprite):
                     self.potions_position.pop(potion_index)
                     
             if clicked_potion == 'imortality':
-                file_path = r'data\sounds\sfx\player\use_imortality.wav'
+                file_path = get_path('sounds', 'sfx', 'player', 'use_imortality')
             elif clicked_potion == 'strength':
-                file_path = r'data\sounds\sfx\player\use_strength.wav'
+                file_path = get_path('sounds', 'sfx', 'player', 'use_strength')
             elif clicked_potion == 'regeneration':
-                file_path = r'data\sounds\sfx\player\use_regeneration.wav'
-            
+                file_path = get_path('sounds', 'sfx', 'player', 'use_regeneration')
+                
             play_sound(file_path, 0.2)
             
     def collide_teleport_place(self, teleport_place_name, npc_pos):
@@ -616,5 +620,5 @@ class Player(pygame.sprite.Sprite):
         self.teleported = True
         self.teleport_place = teleport_place_name
         
-        file_path = r'data\sounds\sfx\teleport_sound.wav'
+        file_path = get_path('sounds', 'sfx', 'teleport_sound')
         play_sound(file_path, 0.2)

@@ -1,5 +1,7 @@
 import pygame
 
+from data.sources.files import Files
+
 class Button:
     ''' Make a button using pygame surface and rect
     
@@ -24,7 +26,8 @@ class Button:
         self.surface.fill(color)
         self.rect = self.surface.get_rect(center=position)
         
-        font = pygame.font.Font(r'data\font\arcade-classic.TTF', text_size)
+        font_path = Files.paths['font']
+        font = pygame.font.Font(font_path, text_size)
         self.text_surf = font.render(text, True, text_collor)
         self.text_rect = self.text_surf.get_rect(center=position)
         
