@@ -1,4 +1,4 @@
-import os
+from os import listdir, path
 import pygame
 
 class GIF:
@@ -20,7 +20,7 @@ class GIF:
         self.set_images(folder_path)
         
     def set_images(self, folder_path):
-        images = os.listdir(folder_path)
+        images = listdir(folder_path)
         for image in images:
             self.animation_images.append(image)
         
@@ -29,7 +29,7 @@ class GIF:
         self.animation_index_limit = len(self.animation_images)
         
     def render_surface(self, convert = False):
-        image_path = self.folder_path + '\\' + self.animation_images[self.animation_index]
+        image_path = path.join(self.folder_path, self.animation_images[self.animation_index])
         image = pygame.image.load(image_path)
         if self.image_size == None:
             self.surface = image
